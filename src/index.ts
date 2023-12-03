@@ -1,7 +1,9 @@
-import { formatDay } from './util';
+import { formatDay, parseArguments } from "./util";
 
-const day = Number(process.env.npm_config_day ?? 0);
-const part = Number(process.env.npm_config_part ?? 0);
+const args = parseArguments();
+
+const day = Number(args.day ?? 0);
+const part = Number(args.part ?? 0);
 
 const outputSolution = (part: number) =>
   console.log(
@@ -11,14 +13,14 @@ const outputSolution = (part: number) =>
     }`
   );
 
-const validate = (type: 'day' | 'part', num: number, max: number) => {
+const validate = (type: "day" | "part", num: number, max: number) => {
   if (num < 1 || num > max + 1)
     throw new Error(
       `The ${type} must be number between 1 and ${max}, you entered ${num}`
     );
 };
 
-validate('day', day, 25);
-validate('part', part, 2);
+validate("day", day, 25);
+validate("part", part, 2);
 
 outputSolution(part);

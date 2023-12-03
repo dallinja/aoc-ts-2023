@@ -1,7 +1,7 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 
 export const formatDay = (day: number | string) =>
-  day.toString().padStart(2, '0');
+  day.toString().padStart(2, "0");
 
 /**
  * @typedef {Object} SplitOptions
@@ -27,16 +27,19 @@ export function parseInput<T>(options: { split: SplitOptions<T> }): T[];
 export function parseInput<T>({
   split,
 }: { split?: SplitOptions<T> | false } = {}) {
+  const args = parseArguments();
+  const day = Number(args.day ?? 0);
+  const inputFileName = args.sample ? "inputSample" : "input";
   const input = readFileSync(
-    `./src/day${formatDay(process.env.npm_config_day!)}/input.txt`,
+    `./src/day${formatDay(day)}/${inputFileName}.txt`,
     {
-      encoding: 'utf-8',
+      encoding: "utf-8",
     }
   );
 
   if (split === false) return input;
 
-  const splitted = input.split(split?.delimiter ?? '\n');
+  const splitted = input.split(split?.delimiter ?? "\n");
   const mapper = split?.mapper;
 
   return mapper === false
@@ -54,7 +57,23 @@ const input = parseInput();
 export const setupDay = (day: number) => {
   const dir = `./src/day${formatDay(day)}`;
   mkdirSync(dir);
-  writeFileSync(`${dir}/input.txt`, '');
+  writeFileSync(`${dir}/input.txt`, "");
   writeFileSync(`${dir}/part1.ts`, genTemplate(1));
   writeFileSync(`${dir}/part2.ts`, genTemplate(2));
 };
+
+export function parseArguments() {
+  const args = process.argv.slice(2);
+  const parsedArgs: Record<string, string | boolean> = {};
+
+  args.forEach((arg) => {
+    // Remove leading '--' from the key
+    const [key, value] = arg.replace(/^--/, "").split("=");
+
+    if (key) {
+      parsedArgs[key] = value ?? true;
+    }
+  });
+
+  return parsedArgs;
+}
