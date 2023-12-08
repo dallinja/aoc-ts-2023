@@ -24,7 +24,7 @@ const cardRank = {
   A: 14,
   K: 13,
   Q: 12,
-  J: 0,
+  J: 1,
   T: 10,
 };
 
@@ -55,7 +55,7 @@ function getType(hand: string): Type {
   }, {});
 
   // counts = { K: 2, 6: 2, 7: 1 }
-  if (jCount > 0) {
+  if (jCount > 0 && jCount !== 5) {
     counts[maxCard] = counts[maxCard] + jCount;
   }
   // console.log("counts: ", counts);
@@ -77,12 +77,17 @@ function getType(hand: string): Type {
   if (values.includes(3)) {
     return "threeOfAKind";
   }
+
   if (values.length === 3) {
     return "twoPair";
   }
 
   if (values.length === 4) {
     return "onePair";
+  }
+
+  if (values.length === 0) {
+    return "fiveOfAKind";
   }
 
   return "highCard";
@@ -96,22 +101,29 @@ function getRank(aHand: string, bHand: string): number {
     const bRank =
       cardRank[bHand[i] as keyof typeof cardRank] || parseInt(bHand[i]);
     if (aRank !== bRank) {
-      return aRank - bRank;
+      sort = aRank - bRank;
+      break;
     }
   }
   return sort;
 }
 
 function solve() {
+  // const slicedInput = input.slice(0, 100);
   input.sort((a, b) => {
     if (a.type === b.type) {
       return getRank(a.hand, b.hand);
     }
     return rank[b.type] - rank[a.type];
   });
+
   // console.log("input: ", input);
 
   return input.reduce((acc, cur, index) => {
+    if (index === 0) {
+      console.log("cur: ", cur);
+    }
+
     acc += cur.bid * (index + 1);
     return acc;
   }, 0);
