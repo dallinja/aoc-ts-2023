@@ -36,15 +36,31 @@ const input = rawInput.map((line) => {
 });
 
 function getType(hand: string): Type {
-  const counts = hand.split("").reduce<Record<string, number>>((acc, cur) => {
-    acc[cur] = acc[cur] ? acc[cur] + 1 : 1;
+  const regex = /J/g;
+  let jCount = hand.match(regex)?.length || 0;
+  // console.log("jCount: ", jCount);
+  let maxCount = 0;
+  let maxCard = "";
+  const counts = hand.split("").reduce<Record<string, number>>((acc, card) => {
+    if (card === "J") {
+      return acc;
+    } else {
+      acc[card] = acc[card] ? acc[card] + 1 : 1;
+      if (acc[card] > maxCount) {
+        maxCount = acc[card];
+        maxCard = card;
+      }
+    }
     return acc;
   }, {});
-  // counts = { K: 2, 6: 2, J: 1 }
-  const { J, ...rest } = counts;
 
-  const values = Object.values(rest);
-  // const values = Object.values(counts);
+  // counts = { K: 2, 6: 2, 7: 1 }
+  if (jCount > 0) {
+    counts[maxCard] = counts[maxCard] + jCount;
+  }
+  // console.log("counts: ", counts);
+
+  const values = Object.values(counts);
 
   if (values.includes(5)) {
     return "fiveOfAKind";
